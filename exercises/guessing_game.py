@@ -1,22 +1,22 @@
 import random
 
 
-def play(secret, max_attempts=10):
-    print("I am thinking of a number between 1 and 100.")
+def play(secret, input_fn=input, output_fn=print, max_attempts=10):
+    output_fn("I am thinking of a number between 1 and 100.")
     for attempt in range(1, max_attempts + 1):
         try:
-            guess = int(input("Guess {}: ".format(attempt)))
+            guess = int(input_fn("Guess {}: ".format(attempt)))
         except ValueError:
-            print("Please type a whole number.")
+            output_fn("Please type a whole number.")
             continue
         if guess < secret:
-            print("Too low")
+            output_fn("Too low")
         elif guess > secret:
-            print("Too high")
+            output_fn("Too high")
         else:
-            print("You got it in {} tries!".format(attempt))
+            output_fn("You got it in {} tries!".format(attempt))
             return True
-    print("Out of tries. The number was {}.".format(secret))
+    output_fn("Out of tries. The number was {}.".format(secret))
     return False
 
 
