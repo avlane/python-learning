@@ -1,11 +1,13 @@
+import re
 import sys
+from collections import Counter
+
+WORD_RE = re.compile(r"[a-z0-9']+")
 
 
 def count_words(text):
-    counts = {}
-    for word in text.split():
-        counts[word] = counts.get(word, 0) + 1
-    return counts
+    """Count words, ignoring case and punctuation."""
+    return Counter(WORD_RE.findall(text.lower()))
 
 
 def main():
@@ -14,8 +16,8 @@ def main():
         return
     with open(sys.argv[1]) as f:
         counts = count_words(f.read())
-    for word in sorted(counts, key=counts.get, reverse=True):
-        print(counts[word], word)
+    for word, n in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
+        print(n, word)
 
 
 if __name__ == "__main__":
