@@ -1,5 +1,5 @@
+import argparse
 import re
-import sys
 from collections import Counter
 
 WORD_RE = re.compile(r"[a-z0-9']+")
@@ -10,13 +10,19 @@ def count_words(text):
     return Counter(WORD_RE.findall(text.lower()))
 
 
-def main():
-    if len(sys.argv) != 2:
-        print("usage: python3 -m exercises.wordcount FILE")
-        return
-    with open(sys.argv[1]) as f:
+def top_words(counts, n=None):
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    return ranked if n is None else ranked[:n]
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Count the words in a text file.")
+    parser.add_argument("file")
+    parser.add_argument("--top", type=int, metavar="N", help="only show the N most common words")
+    args = parser.parse_args(argv)
+    with open(args.file) as f:
         counts = count_words(f.read())
-    for word, n in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
+    for word, n in top_words(counts, args.top):
         print(n, word)
 
 

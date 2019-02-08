@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from exercises.wordcount import count_words
+from exercises.wordcount import count_words, top_words
 
 FIXTURE = os.path.join(os.path.dirname(__file__), "fixtures", "sample.txt")
 
@@ -18,6 +18,11 @@ class WordCountTests(unittest.TestCase):
 
     def test_keeps_apostrophes(self):
         self.assertEqual(count_words("it's here?"), {"it's": 1, "here": 1})
+
+    def test_top_words_orders_by_count_then_alphabet(self):
+        counts = count_words("b a b c c d")
+        self.assertEqual(top_words(counts, 2), [("b", 2), ("c", 2)])
+        self.assertEqual(len(top_words(counts)), 4)
 
     def test_fixture_file(self):
         with open(FIXTURE) as f:
