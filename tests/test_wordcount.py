@@ -24,6 +24,10 @@ class WordCountTests(unittest.TestCase):
         self.assertEqual(top_words(counts, 2), [("b", 2), ("c", 2)])
         self.assertEqual(len(top_words(counts)), 4)
 
+    def test_skip_common_words(self):
+        counts = count_words("The cat and the hat", skip_common=True)
+        self.assertEqual(counts, {"cat": 1, "hat": 1})
+
     def test_fixture_file(self):
         with open(FIXTURE) as f:
             counts = count_words(f.read())
