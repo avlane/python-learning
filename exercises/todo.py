@@ -23,6 +23,11 @@ def add(items, text):
     return items
 
 
+def mark_done(items, number):
+    items[number - 1]["done"] = True
+    return items
+
+
 def format_items(items):
     if not items:
         return "Nothing to do."
@@ -41,6 +46,8 @@ def main(argv=None):
     p_add = sub.add_parser("add", help="add an item")
     p_add.add_argument("text", nargs="+")
     sub.add_parser("list", help="show all items")
+    p_done = sub.add_parser("done", help="mark an item as done")
+    p_done.add_argument("number", type=int)
     args = parser.parse_args(argv)
 
     items = load(args.file)
@@ -48,6 +55,10 @@ def main(argv=None):
         add(items, " ".join(args.text))
         save(args.file, items)
         print("Added.")
+    elif args.command == "done":
+        mark_done(items, args.number)
+        save(args.file, items)
+        print("Marked item {} as done.".format(args.number))
     elif args.command == "list":
         print(format_items(items))
 
