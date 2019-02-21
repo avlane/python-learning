@@ -6,6 +6,15 @@ import sys
 DEFAULT_PATH = os.path.expanduser("~/.todo.json")
 
 
+class TodoError(Exception):
+    pass
+
+
+def _check_number(items, number):
+    if not 1 <= number <= len(items):
+        raise TodoError("there is no item {} (the list has {})".format(number, len(items)))
+
+
 def load(path):
     if not os.path.exists(path):
         return []
@@ -24,8 +33,14 @@ def add(items, text):
 
 
 def mark_done(items, number):
+    _check_number(items, number)
     items[number - 1]["done"] = True
     return items
+
+
+def remove(items, number):
+    _check_number(items, number)
+    return items.pop(number - 1)
 
 
 def format_items(items):
@@ -48,20 +63,31 @@ def main(argv=None):
     sub.add_parser("list", help="show all items")
     p_done = sub.add_parser("done", help="mark an item as done")
     p_done.add_argument("number", type=int)
+    p_rm = sub.add_parser("remove", help="delete an item")
+    p_rm.add_argument("number", type=int)
     args = parser.parse_args(argv)
 
-    items = load(args.file)
-    if args.command == "add":
-        add(items, " ".join(args.text))
-        save(args.file, items)
-        print("Added.")
-    elif args.command == "done":
-        mark_done(items, args.number)
-        save(args.file, items)
-        print("Marked item {} as done.".format(args.number))
-    elif args.command == "list":
-        print(format_items(items))
+    try:
+        items = load(args.file)
+        if args.command == "add":
+            add(items, " ".join(args.text))
+            save(args.file, items)
+            print("Added.")
+        elif args.command == "done":
+            mark_done(items, args.number)
+            save(args.file, items)
+            print("Marked item {} as done.".format(args.number))
+        elif args.command == "remove":
+            removed = remove(items, args.number)
+            save(args.file, items)
+            print("Removed: {}".format(removed["text"]))
+        elif args.command == "list":
+            print(format_items(items))
+    except TodoError as err:
+        print("todo: {}".format(err), file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
