@@ -1,0 +1,58 @@
+import contextlib
+import io
+import json
+import os
+import tempfile
+import unittest
+
+from exercises import todo
+
+
+class TodoTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.path = os.path.join(self.tmp.name, "todo.json")
+
+    def run_cli(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = todo.main(["--file", self.path] + list(argv))
+        return code, out.getvalue(), err.getvalue()
+
+    def test_missing_file_is_an_empty_list(self):
+        self.assertEqual(todo.load(self.path), [])
+
+    def test_add_and_list(self):
+        self.run_cli("add", "buy", "milk")
+        self.run_cli("add", "call mum")
+        code, out, _ = self.run_cli("list")
+        self.assertEqual(code, 0)
+        self.assertEqual(out.splitlines(), ["1. [ ] buy milk", "2. [ ] call mum"])
+
+    def test_done_is_saved(self):
+        self.run_cli("add", "water plants")
+        self.run_cli("done", "1")
+        with open(self.path) as f:
+            self.assertTrue(json.load(f)[0]["done"])
+
+    def test_remove(self):
+        self.run_cli("add", "one")
+        self.run_cli("add", "two")
+        code, out, _ = self.run_cli("remove", "1")
+        self.assertEqual(out.strip(), "Removed: one")
+        self.assertEqual([i["text"] for i in todo.load(self.path)], ["two"])
+
+    def test_bad_number(self):
+        self.run_cli("add", "one")
+        code, _, err = self.run_cli("done", "5")
+        self.assertEqual(code, 1)
+        self.assertIn("there is no item 5", err)
+
+    def test_empty_list_message(self):
+        _, out, _ = self.run_cli("list")
+        self.assertEqual(out.strip(), "Nothing to do.")
+
+
+if __name__ == "__main__":
+    unittest.main()
