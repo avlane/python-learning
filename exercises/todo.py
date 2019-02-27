@@ -19,12 +19,21 @@ def load(path):
     if not os.path.exists(path):
         return []
     with open(path) as f:
-        return json.load(f)
+        try:
+            items = json.load(f)
+        except ValueError:
+            raise TodoError("{} is not valid JSON; fix or delete it".format(path))
+    if not isinstance(items, list):
+        raise TodoError("{} does not contain a list of items".format(path))
+    return items
 
 
 def save(path, items):
-    with open(path, "w") as f:
+    # write to a temporary file first so a crash cannot leave half a file behind
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w") as f:
         json.dump(items, f, indent=2)
+    os.replace(tmp_path, path)
 
 
 def add(items, text):

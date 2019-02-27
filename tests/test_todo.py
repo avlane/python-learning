@@ -49,6 +49,24 @@ class TodoTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("there is no item 5", err)
 
+    def test_corrupt_file_is_reported(self):
+        with open(self.path, "w") as f:
+            f.write("{not json")
+        code, _, err = self.run_cli("list")
+        self.assertEqual(code, 1)
+        self.assertIn("is not valid JSON", err)
+
+    def test_wrong_shape_is_reported(self):
+        with open(self.path, "w") as f:
+            f.write('{"a": 1}')
+        code, _, err = self.run_cli("list")
+        self.assertEqual(code, 1)
+        self.assertIn("does not contain a list", err)
+
+    def test_save_leaves_no_temp_file(self):
+        self.run_cli("add", "x")
+        self.assertEqual(os.listdir(self.tmp.name), ["todo.json"])
+
     def test_empty_list_message(self):
         _, out, _ = self.run_cli("list")
         self.assertEqual(out.strip(), "Nothing to do.")
