@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 
 DEFAULT_PATH = os.path.expanduser("~/.todo.json")
@@ -36,8 +37,14 @@ def save(path, items):
     os.replace(tmp_path, path)
 
 
-def add(items, text):
-    items.append({"text": text, "done": False})
+def validate_due(due):
+    if due is not None and not re.match(r"^\d{4}-\d{2}-\d{2}$", due):
+        raise TodoError("due date must look like 2019-03-14, got {!r}".format(due))
+    return due
+
+
+def add(items, text, due=None):
+    items.append({"text": text, "done": False, "due": validate_due(due)})
     return items
 
 
@@ -58,7 +65,10 @@ def format_items(items):
     lines = []
     for number, item in enumerate(items, 1):
         mark = "x" if item["done"] else " "
-        lines.append("{}. [{}] {}".format(number, mark, item["text"]))
+        line = "{}. [{}] {}".format(number, mark, item["text"])
+        if item.get("due"):
+            line += " (due {})".format(item["due"])
+        lines.append(line)
     return "\n".join(lines)
 
 
@@ -69,6 +79,7 @@ def main(argv=None):
     sub.required = True
     p_add = sub.add_parser("add", help="add an item")
     p_add.add_argument("text", nargs="+")
+    p_add.add_argument("--due", metavar="YYYY-MM-DD")
     sub.add_parser("list", help="show all items")
     p_done = sub.add_parser("done", help="mark an item as done")
     p_done.add_argument("number", type=int)
@@ -79,7 +90,7 @@ def main(argv=None):
     try:
         items = load(args.file)
         if args.command == "add":
-            add(items, " ".join(args.text))
+            add(items, " ".join(args.text), args.due)
             save(args.file, items)
             print("Added.")
         elif args.command == "done":
