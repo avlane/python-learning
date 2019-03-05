@@ -59,11 +59,15 @@ def remove(items, number):
     return items.pop(number - 1)
 
 
-def format_items(items):
+def format_items(items, by_due=False):
     if not items:
         return "Nothing to do."
+    numbered = list(enumerate(items, 1))
+    if by_due:
+        # items without a due date go last; numbers still refer to the stored order
+        numbered.sort(key=lambda pair: (not pair[1].get("due"), pair[1].get("due") or ""))
     lines = []
-    for number, item in enumerate(items, 1):
+    for number, item in numbered:
         mark = "x" if item["done"] else " "
         line = "{}. [{}] {}".format(number, mark, item["text"])
         if item.get("due"):
@@ -80,7 +84,8 @@ def main(argv=None):
     p_add = sub.add_parser("add", help="add an item")
     p_add.add_argument("text", nargs="+")
     p_add.add_argument("--due", metavar="YYYY-MM-DD")
-    sub.add_parser("list", help="show all items")
+    p_list = sub.add_parser("list", help="show all items")
+    p_list.add_argument("--by-due", action="store_true", help="show the earliest due date first")
     p_done = sub.add_parser("done", help="mark an item as done")
     p_done.add_argument("number", type=int)
     p_rm = sub.add_parser("remove", help="delete an item")
@@ -102,7 +107,7 @@ def main(argv=None):
             save(args.file, items)
             print("Removed: {}".format(removed["text"]))
         elif args.command == "list":
-            print(format_items(items))
+            print(format_items(items, args.by_due))
     except TodoError as err:
         print("todo: {}".format(err), file=sys.stderr)
         return 1

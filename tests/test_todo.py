@@ -35,6 +35,17 @@ class TodoTests(unittest.TestCase):
         _, out, _ = self.run_cli("list")
         self.assertEqual(out.strip(), "1. [ ] pay rent (due 2019-03-14)")
 
+    def test_list_by_due(self):
+        self.run_cli("add", "no date")
+        self.run_cli("add", "--due", "2019-05-01", "later")
+        self.run_cli("add", "--due", "2019-04-01", "sooner")
+        _, out, _ = self.run_cli("list", "--by-due")
+        self.assertEqual(out.splitlines(), [
+            "3. [ ] sooner (due 2019-04-01)",
+            "2. [ ] later (due 2019-05-01)",
+            "1. [ ] no date",
+        ])
+
     def test_bad_due_date(self):
         code, _, err = self.run_cli("add", "--due", "tomorrow", "x")
         self.assertEqual(code, 1)
