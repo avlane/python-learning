@@ -21,3 +21,27 @@ def render(board):
     for start in (0, 3, 6):
         rows.append(" " + " | ".join(board[start:start + 3]))
     return "\n---+---+---\n".join(rows)
+
+
+def play(input_fn=input, output_fn=print):
+    board = new_board()
+    mark = "X"
+    for _ in range(9):
+        output_fn(render(board))
+        square = int(input_fn("{} to move (1-9): ".format(mark)))
+        board[square - 1] = mark
+        if winner(board):
+            output_fn(render(board))
+            output_fn("{} wins!".format(mark))
+            return mark
+        mark = "O" if mark == "X" else "X"
+    output_fn("It is a draw.")
+    return None
+
+
+def main():
+    play()
+
+
+if __name__ == "__main__":
+    main()
