@@ -9,6 +9,19 @@ def new_board():
     return [" "] * 9
 
 
+def make_move(board, square, mark):
+    """Place mark on square 1-9. Raises ValueError if the move is not allowed."""
+    if not 1 <= square <= 9:
+        raise ValueError("choose a square from 1 to 9")
+    if board[square - 1] != " ":
+        raise ValueError("square {} is already taken".format(square))
+    board[square - 1] = mark
+
+
+def is_full(board):
+    return " " not in board
+
+
 def winner(board):
     for a, b, c in WIN_LINES:
         if board[a] != " " and board[a] == board[b] == board[c]:
@@ -26,15 +39,19 @@ def render(board):
 def play(input_fn=input, output_fn=print):
     board = new_board()
     mark = "X"
-    for _ in range(9):
+    while not is_full(board):
         output_fn(render(board))
-        square = int(input_fn("{} to move (1-9): ".format(mark)))
-        board[square - 1] = mark
+        try:
+            make_move(board, int(input_fn("{} to move (1-9): ".format(mark))), mark)
+        except ValueError as err:
+            output_fn("Sorry, " + str(err) + ".")
+            continue
         if winner(board):
             output_fn(render(board))
             output_fn("{} wins!".format(mark))
             return mark
         mark = "O" if mark == "X" else "X"
+    output_fn(render(board))
     output_fn("It is a draw.")
     return None
 
