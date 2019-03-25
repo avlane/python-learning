@@ -1,6 +1,6 @@
 import unittest
 
-from exercises.tictactoe import is_full, make_move, new_board, play, render, winner
+from exercises.tictactoe import computer_move, free_squares, is_full, make_move, new_board, play, render, winner
 
 
 def board_from(text):
@@ -45,6 +45,38 @@ class MoveTests(unittest.TestCase):
     def test_is_full(self):
         self.assertFalse(is_full(new_board()))
         self.assertTrue(is_full(list("XOXOXOOXO")))
+
+
+class FirstChoice:
+    """Stand-in for the random module that always picks the first option."""
+
+    @staticmethod
+    def choice(options):
+        return options[0]
+
+
+class ComputerTests(unittest.TestCase):
+    def test_takes_a_winning_move(self):
+        board = board_from("OO /XX /   ")
+        self.assertEqual(computer_move(board, "O", FirstChoice), 3)
+
+    def test_blocks_the_opponent(self):
+        board = board_from("XX /O  /   ")
+        self.assertEqual(computer_move(board, "O", FirstChoice), 3)
+
+    def test_prefers_the_middle_then_a_corner(self):
+        self.assertEqual(computer_move(new_board(), "O", FirstChoice), 5)
+        board = board_from("   / X /   ")
+        self.assertEqual(computer_move(board, "O", FirstChoice), 1)
+
+    def test_free_squares(self):
+        self.assertEqual(free_squares(board_from("X  /   /  O")), [2, 3, 4, 5, 6, 7, 8])
+
+    def test_computer_never_loses_to_a_scripted_human(self):
+        moves = iter(["1", "2", "9", "6", "7", "8", "3", "4"])
+        lines = []
+        result = play(lambda prompt: next(moves), lines.append, computer="O")
+        self.assertIn(result, ("O", None))
 
 
 class GameTests(unittest.TestCase):
