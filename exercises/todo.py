@@ -1,7 +1,7 @@
 import argparse
 import json
+import datetime
 import os
-import re
 import sys
 
 DEFAULT_PATH = os.path.expanduser("~/.todo.json")
@@ -38,9 +38,13 @@ def save(path, items):
 
 
 def validate_due(due):
-    if due is not None and not re.match(r"^\d{4}-\d{2}-\d{2}$", due):
+    """Return the due date as YYYY-MM-DD; accepts 2019-3-5 and fixes it up."""
+    if due is None:
+        return None
+    try:
+        return datetime.datetime.strptime(due, "%Y-%m-%d").date().isoformat()
+    except ValueError:
         raise TodoError("due date must look like 2019-03-14, got {!r}".format(due))
-    return due
 
 
 def add(items, text, due=None):

@@ -46,6 +46,14 @@ class TodoTests(unittest.TestCase):
             "1. [ ] no date",
         ])
 
+    def test_single_digit_month_and_day_are_normalised(self):
+        self.run_cli("add", "--due", "2019-3-5", "taxes")
+        self.assertEqual(todo.load(self.path)[0]["due"], "2019-03-05")
+
+    def test_impossible_date_is_refused(self):
+        code, _, err = self.run_cli("add", "--due", "2019-02-30", "x")
+        self.assertEqual(code, 1)
+
     def test_bad_due_date(self):
         code, _, err = self.run_cli("add", "--due", "tomorrow", "x")
         self.assertEqual(code, 1)
