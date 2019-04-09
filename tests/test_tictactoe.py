@@ -64,10 +64,12 @@ class ComputerTests(unittest.TestCase):
         board = board_from("XX /O  /   ")
         self.assertEqual(computer_move(board, "O", FirstChoice), 3)
 
-    def test_prefers_the_middle_then_a_corner(self):
+    def test_prefers_the_middle_then_any_free_square(self):
         self.assertEqual(computer_move(new_board(), "O", FirstChoice), 5)
         board = board_from("   / X /   ")
         self.assertEqual(computer_move(board, "O", FirstChoice), 1)
+        board = board_from("O  / X /   ")
+        self.assertEqual(computer_move(board, "O", FirstChoice), 2)
 
     def test_free_squares(self):
         self.assertEqual(free_squares(board_from("X  /   /  O")), [2, 3, 4, 5, 6, 7, 8])

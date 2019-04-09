@@ -43,7 +43,7 @@ def free_squares(board):
 
 
 def computer_move(board, mark, rng=random):
-    """Pick a square for mark: win if possible, else block, else take the middle or a corner."""
+    """Pick a square for mark: win if possible, else block, else take the middle or any free square."""
     other = "O" if mark == "X" else "X"
     for who in (mark, other):
         for square in free_squares(board):
@@ -54,8 +54,7 @@ def computer_move(board, mark, rng=random):
     free = free_squares(board)
     if 5 in free:
         return 5
-    corners = [s for s in free if s in (1, 3, 7, 9)]
-    return rng.choice(corners or free)
+    return rng.choice(free)
 
 
 def play(input_fn=input, output_fn=print, computer=None):
