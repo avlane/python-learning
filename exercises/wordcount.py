@@ -1,5 +1,6 @@
 import argparse
 import re
+from pathlib import Path
 from collections import Counter
 
 WORD_RE = re.compile(r"[a-z0-9']+")
@@ -25,8 +26,7 @@ def main(argv=None):
     parser.add_argument("--top", type=int, metavar="N", help="only show the N most common words")
     parser.add_argument("--skip-common", action="store_true", help="leave out words like 'the' and 'and'")
     args = parser.parse_args(argv)
-    with open(args.file) as f:
-        counts = count_words(f.read(), args.skip_common)
+    counts = count_words(Path(args.file).read_text(), args.skip_common)
     for word, n in top_words(counts, args.top):
         print(n, word)
 

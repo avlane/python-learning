@@ -3,8 +3,9 @@ import json
 import datetime
 import os
 import sys
+from pathlib import Path
 
-DEFAULT_PATH = os.path.expanduser("~/.todo.json")
+DEFAULT_PATH = str(Path.home() / ".todo.json")
 
 
 class TodoError(Exception):
@@ -17,13 +18,13 @@ def _check_number(items, number):
 
 
 def load(path):
-    if not os.path.exists(path):
+    path = Path(path)
+    if not path.exists():
         return []
-    with open(path) as f:
-        try:
-            items = json.load(f)
-        except ValueError:
-            raise TodoError("{} is not valid JSON; fix or delete it".format(path))
+    try:
+        items = json.loads(path.read_text())
+    except ValueError:
+        raise TodoError("{} is not valid JSON; fix or delete it".format(path))
     if not isinstance(items, list):
         raise TodoError("{} does not contain a list of items".format(path))
     return items
@@ -31,10 +32,10 @@ def load(path):
 
 def save(path, items):
     # write to a temporary file first so a crash cannot leave half a file behind
-    tmp_path = path + ".tmp"
-    with open(tmp_path, "w") as f:
-        json.dump(items, f, indent=2)
-    os.replace(tmp_path, path)
+    path = Path(path)
+    tmp_path = path.with_name(path.name + ".tmp")
+    tmp_path.write_text(json.dumps(items, indent=2))
+    os.replace(str(tmp_path), str(path))
 
 
 def validate_due(due):
