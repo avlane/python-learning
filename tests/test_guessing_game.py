@@ -29,6 +29,10 @@ class GuessingGameTests(unittest.TestCase):
         self.assertFalse(won)
         self.assertEqual(lines[-1], "Out of tries. The number was 7.")
 
+    def test_typos_do_not_use_up_attempts(self):
+        won, lines = self.run_game(5, ["x", "y", "z", "5"], max_attempts=1)
+        self.assertTrue(won)
+
     def test_non_numbers_are_rejected(self):
         won, lines = self.run_game(5, ["abc", "5"])
         self.assertTrue(won)

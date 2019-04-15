@@ -3,12 +3,15 @@ import random
 
 def play(secret, input_fn=input, output_fn=print, max_attempts=10):
     output_fn("I am thinking of a number between 1 and 100.")
-    for attempt in range(1, max_attempts + 1):
+    attempt = 0
+    while attempt < max_attempts:
         try:
-            guess = int(input_fn("Guess {}: ".format(attempt)))
+            guess = int(input_fn("Guess {}: ".format(attempt + 1)))
         except ValueError:
+            # typos should not cost an attempt
             output_fn("Please type a whole number.")
             continue
+        attempt += 1
         if guess < secret:
             output_fn("Too low")
         elif guess > secret:
