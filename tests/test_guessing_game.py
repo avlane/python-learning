@@ -1,6 +1,6 @@
 import unittest
 
-from exercises.guessing_game import play
+from exercises.guessing_game import LEVELS, play
 
 
 def scripted(answers):
@@ -28,6 +28,14 @@ class GuessingGameTests(unittest.TestCase):
         won, lines = self.run_game(7, ["1", "2", "3"], max_attempts=3)
         self.assertFalse(won)
         self.assertEqual(lines[-1], "Out of tries. The number was 7.")
+
+    def test_range_is_announced(self):
+        _, lines = self.run_game(3, ["3"], highest=50)
+        self.assertEqual(lines[0], "I am thinking of a number between 1 and 50.")
+
+    def test_levels_are_sane(self):
+        for highest, attempts in LEVELS.values():
+            self.assertGreater(highest, attempts)
 
     def test_typos_do_not_use_up_attempts(self):
         won, lines = self.run_game(5, ["x", "y", "z", "5"], max_attempts=1)

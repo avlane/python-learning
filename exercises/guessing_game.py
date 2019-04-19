@@ -1,8 +1,15 @@
 import random
 
 
-def play(secret, input_fn=input, output_fn=print, max_attempts=10):
-    output_fn("I am thinking of a number between 1 and 100.")
+LEVELS = {
+    "easy": (50, 10),
+    "medium": (100, 7),
+    "hard": (1000, 10),
+}
+
+
+def play(secret, input_fn=input, output_fn=print, max_attempts=10, highest=100):
+    output_fn("I am thinking of a number between 1 and {}.".format(highest))
     attempt = 0
     while attempt < max_attempts:
         try:
@@ -24,7 +31,9 @@ def play(secret, input_fn=input, output_fn=print, max_attempts=10):
 
 
 def main():
-    play(random.randint(1, 100))
+    level = input("Level (easy/medium/hard)? ").strip().lower()
+    highest, attempts = LEVELS.get(level, LEVELS["medium"])
+    play(random.randint(1, highest), max_attempts=attempts, highest=highest)
 
 
 if __name__ == "__main__":
