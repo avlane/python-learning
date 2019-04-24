@@ -1,3 +1,5 @@
+"""FizzBuzz, one number at a time."""
+
 def fizzbuzz(n):
     if n % 15 == 0:
         return "FizzBuzz"

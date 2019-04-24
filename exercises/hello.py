@@ -1,3 +1,5 @@
+"""Say hello."""
+
 def greeting(name):
     name = name.strip() or "world"
     return "Hello, {}!".format(name)

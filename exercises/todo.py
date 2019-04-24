@@ -1,3 +1,5 @@
+"""A tiny todo list stored in a JSON file."""
+
 import argparse
 import json
 import datetime

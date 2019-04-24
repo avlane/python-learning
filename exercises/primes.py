@@ -1,3 +1,5 @@
+"""Sieve of Eratosthenes and a trial division check."""
+
 def primes_up_to(limit):
     """Sieve of Eratosthenes: all primes <= limit."""
     if limit < 2:

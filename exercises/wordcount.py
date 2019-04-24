@@ -1,3 +1,5 @@
+"""Count the words in a text file."""
+
 import argparse
 import re
 from pathlib import Path

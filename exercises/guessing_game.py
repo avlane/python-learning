@@ -1,3 +1,5 @@
+"""Number guessing game with difficulty levels."""
+
 import random
 
 

@@ -1,3 +1,5 @@
+"""Tic-tac-toe for two players, or against a simple computer opponent."""
+
 import random
 
 WIN_LINES = [
